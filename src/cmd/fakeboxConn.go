@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"strings"
+
+	"golang.org/x/net/html"
 )
 
 const postURL = "http://localhost:8080/fakebox/check/"
@@ -41,32 +41,50 @@ func main() {
 	fmt.Println("Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("Body:", string(body))
-	getTitle(articleData.URL)
+
+	z := html.NewTokenizer(resp.Body)
+
+	for {
+		tt := z.Next()
+
+		switch {
+		case tt == html.ErrorToken:
+			// End of the document, we're done
+			return
+		case tt == html.StartTagToken:
+			t := z.Token()
+
+			isAnchor := t.Data == "h1"
+			if isAnchor {
+				fmt.Println("We found a title!")
+			}
+		}
+	}
 }
 
-func getTitle(response string) {
-	// converts byte into string
-	articleContent := string(response)
+// func getTitle(response &Response) {
+// 	// converts byte into string
+// 	articleContent := html.NewTokenizer(response)
 
-	// searches for title index
-	titleStartIndex := strings.Index(articleContent, "<h1>")
+// 	// searches for title index
+// 	titleStartIndex := strings.Index(articleContent, "<h1>")
 
-	// if no titles found
-	if titleStartIndex == -1 {
-		fmt.Println("No title element found")
-		os.Exit(0)
-	}
+// 	// if no titles found
+// 	if titleStartIndex == -1 {
+// 		fmt.Println("No title element found")
+// 		os.Exit(0)
+// 	}
 
-	// offset by 7 characters (aka the amount of characters in <title>)
-	titleStartIndex += 7
+// 	// offset by 7 characters (aka the amount of characters in <title>)
+// 	titleStartIndex += 7
 
-	// searches for title closing tag
-	titleEndIndex := strings.Index(articleContent, "</h1>")
-	if titleEndIndex == -1 {
-		fmt.Println("No closing tag for title found")
-		os.Exit(0)
-	}
+// 	// searches for title closing tag
+// 	titleEndIndex := strings.Index(articleContent, "</h1>")
+// 	if titleEndIndex == -1 {
+// 		fmt.Println("No closing tag for title found")
+// 		os.Exit(0)
+// 	}
 
-	pageTitle := []byte(articleContent[titleStartIndex:titleEndIndex])
-	fmt.Println("Title: %s", pageTitle)
-}
+// 	pageTitle := []byte(articleContent[titleStartIndex:titleEndIndex])
+// 	fmt.Println("Title: %s", pageTitle)
+// }
