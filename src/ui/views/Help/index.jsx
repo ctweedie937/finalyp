@@ -1,0 +1,127 @@
+import React, {Component} from "react";
+import { Grid, GridColumn, Header, Menu } from "semantic-ui-react";
+import { Link } from "react-router-dom"
+
+class Help extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            activeItem: "help",
+        }
+    }
+
+    render() {
+
+        const { activeItem } = this.state;
+
+        return (
+            <Grid celled divided>
+                <Grid.Row>
+                    <Grid.Column width={2}>
+                        <Header size="huge" textAlign="center"></Header>
+                    </Grid.Column>
+                    <Grid.Column width={13}>
+                        <Header size="huge" textAlign="center">Fake News Detector</Header>
+                    </Grid.Column>
+                </Grid.Row>
+
+                <Grid.Row>
+                    <GridColumn width={2}>
+                        <Menu fluid vertical>
+                            <Menu.Item
+                                name="homepage"
+                                active={activeItem === "homepage"}
+                                as={Link} to="/"
+                            />
+                            <Menu.Item
+                                name="analyse"
+                                active={activeItem === "analyse"}
+                                as={Link} to="/analyse"
+                            />
+                            <Menu.Item
+                                name="login"
+                                active={activeItem === "login"}
+                                as={Link} to="/login"
+                            />
+                            <Menu.Item
+                                name="help"
+                                active={activeItem === "help"}
+                                as={Link} to="/help"
+                            />
+                        </Menu>
+                    </GridColumn>
+                    <GridColumn width={13}>
+                        <Grid padded>
+                            <Grid.Row>
+                                <Header as="h1">Help</Header>
+                            </Grid.Row>
+
+                            <Grid.Row>
+                                <Header as="h3">Not sure how to use the tool? See below for some common questions about it.</Header>
+                            </Grid.Row>
+
+                            <p></p>
+
+                            <Grid.Row>
+                                <Header as="h5">How do I analyse an article?</Header>
+                            </Grid.Row>
+                            <Grid.Row>
+                                <p>To analyse an article, click Analyse in the menu bar.</p>
+                            </Grid.Row>
+
+                            <p></p>
+                            <br></br>
+                            
+                            <Grid.Row>
+                                <Header as="h5">How accurate is the analysis?</Header>
+                            </Grid.Row>
+                            <Grid.Row>
+                                <p>
+                                    The tool makes use of Machinebox's Fakebox to estimate the "fakeness" of the article, which uses AI to classify keywords from
+                                    the text. It analyses keywords that may sway the score one way or another (such as the use of emotive language), and gives the
+                                    words for each section (Title and Content) a score between 0.1 and 1 based on these keywords. This website then averages these
+                                    scores to give the result displayed.
+
+                                    <br/>
+                                    <br/>
+
+                                    Unfortunately due to the nature of detecting fake news, it's hard to be completely accurate. Some articles are more suceptible to
+                                    this, such as articles that are:
+                                    <ul>
+                                        <li>
+                                            satirical or parody
+                                        </li>
+                                        <li>
+                                            opinion pieces
+                                        </li>
+                                    </ul>
+                                    
+
+                                    This means that although it may not be totally accurate, it should give the user a good idea on whether to trust the article or not (~95% of the time).
+                                </p>
+                            </Grid.Row>
+                            
+                            <p></p>
+                            <br></br>
+                            
+                            <Grid.Row>
+                                <Header as="h5">Why does the domain name (URL) not factor into the result?</Header>
+                            </Grid.Row>
+                            <Grid.Row>
+                                <p>
+                                    It is hard to guess what the chances of the website is writing fake news is. This is because a website could write both opinion
+                                    and news pieces. Also, it is hard to not factor bias into what domain is "fake news"-oriented and what news sites are foused on
+                                    providing facts, for example, some left-wing news sites might see right-wing news sites as "fake news". 
+                                    Therefore, it is easiest to just give a verbal description of what the website is about.
+                                </p>
+                            </Grid.Row>
+                            
+                        </Grid>
+                    </GridColumn>
+                </Grid.Row>
+            </Grid>
+        )
+    }
+}
+
+export default Help
