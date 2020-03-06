@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Grid, GridColumn, Header, Menu } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Menu, Container, List } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import cookie from "react-cookies";
 import { auth } from "../../../firebase";
@@ -14,6 +14,7 @@ class Home extends Component {
             user: {},
         }
         this.signOut = this.signOut.bind(this);
+        console.log("Home user: ", this.state.user)
     }
 
     componentDidMount() {
@@ -23,6 +24,8 @@ class Home extends Component {
         if((this.state.user)!== null) {
             this.setState({loggedIn: true})
         }
+
+        console.log("login mount user:", this.state.user )
     }
 
     componentWillUnmount() {
@@ -45,16 +48,39 @@ class Home extends Component {
 
     render() {
 
-        const { activeItem, loggedIn } = this.state;
-        let signInStatus;
+        const { activeItem } = this.state;
+        let signInStatus, prevArticles;
 
-        if(loggedIn) {
+        let cookieUser = cookie.load('user')
+        console.log("home cookieUser: ", cookieUser)
+
+        if(cookieUser) {
             signInStatus = <Menu.Item
                 name="Logout"
                 active={activeItem === "homepage"}
                 as={Link} to="/login"
-                onClick={this.signOut.bind(this)}
+                onClick={this.signOut}
             />
+
+            prevArticles = 
+            <div>
+                <Header textAlign="center">Previous articles</Header>
+            <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
+                <List bulleted>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                </List>
+            </Menu>
+            </div>
+            
 
         } else {
             signInStatus = <Menu.Item
@@ -79,7 +105,8 @@ class Home extends Component {
                 {/* Menu */}
                 <Grid.Row>
                     <GridColumn width={2}>
-                        <Menu fluid vertical>
+                            {prevArticles}
+                        <Menu secondary fluid vertical>
                             <Menu.Item
                                 name="homepage"
                                 active={activeItem === "homepage"}
