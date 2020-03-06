@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
-import { Grid, GridColumn, Header, Segment, Input, Button, Menu, Progress, Container, Label } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Segment, Input, Button, Menu, Progress, Container, Label, List } from "semantic-ui-react";
 import { Link } from "react-router-dom"
+import cookie from "react-cookies";
+import { auth } from "../../../firebase";
+import { db } from "../../../firebase.js";
 
 
 
@@ -20,17 +23,37 @@ class Analyse extends Component {
             displayTitle: "",
             displayContent: "",
             displayUrl: "",
+            loggedIn: false,
+            user: {},
         }
         this.handleChange = this.handleChange.bind(this)
         this.httpReq = this.httpReq.bind(this)
+        this.signOut = this.signOut.bind(this);
     }
 
+    // input change
     handleChange(e, type = "") {
         this.setState({
             [type]: e.value,
         });
     }
 
+    componentDidMount() {
+        let getUID = cookie.load('user')
+        this.state =  { user: getUID }
+
+        if((this.state.user)!== null) {
+            this.setState({loggedIn: true})
+        }
+
+        console.log("analyse  mount user:", this.state.user )
+    }
+
+    componentWillUnmount() {
+        this.loggedIn = this.state.loggedIn;
+    }
+
+    // displays certain colour bar depending on rating
     displayColour() {
         const labelScore = this.state.score
 
@@ -49,6 +72,7 @@ class Analyse extends Component {
         }
     }
 
+    // displays the verdict
     displayVerdict() {
         const verdict = this.state.score
 
@@ -155,9 +179,84 @@ class Analyse extends Component {
         http.send(JSON.stringify(body))
     }
 
+    signOut = () => {
+        auth.signOut()
+            .then(() => {
+                console.log("Sign out successful")
+                this.setState({loggedIn: false})
+                cookie.remove('user', { path: '/' })
+                
+                console.log("signout user: ", this.state.user)
+            }).catch(() => {
+                console.log("Sign out unsuccessful")
+            })
+    }
+
+    // saveArticle = () => {
+    //     const artid = user.uid;
+    //     db.collection("analysedArticles").doc(uid).set({
+    //         headline: title,
+    //         content: content,
+    //         url: url,
+    //         fake: verdict,
+    //     }).then(() => {
+    //         console.log("added to analysed articles")
+    //         db.collection("prevAccessed").doc()
+    //     }).catch((err) => {
+    //         console.error(err)
+    //     });
+    // }
+
     render() {
 
         const { title, content, url, activeItem, score, trusted, colour, verdict, displayTitle, displayContent, displayUrl } = this.state;
+        let prevArticles, signInStatus, saveButton;
+
+        let cookieUser = cookie.load('user')
+
+        if(cookieUser) {
+            signInStatus = <Menu.Item
+                name="Logout"
+                active={activeItem === "homepage"}
+                as={Link} to="/login"
+                onClick={this.signOut}
+            />
+
+            prevArticles = 
+                <div>
+                    <Header textAlign="center">Previous articles</Header>
+                    <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
+                    <List bulleted>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                        <List.Item>hi</List.Item>
+                    </List>
+                </Menu>
+                </div>
+            if(title || content) {
+                saveButton = 
+                <Grid.Column>
+                    <Button>
+                        Save
+                    </Button>
+                </Grid.Column>
+
+            }
+
+        } else {
+            signInStatus = <Menu.Item
+                name="login"
+                active={activeItem === "login"}
+                as={Link} to="/login"
+            />
+        }
 
         return (
             <Grid celled divided>
@@ -172,7 +271,8 @@ class Analyse extends Component {
 
                 <Grid.Row>
                     <GridColumn width={2}>
-                        <Menu fluid vertical>
+                        {prevArticles}
+                        <Menu secondary fluid vertical>
                             <Menu.Item
                                 name="homepage"
                                 active={activeItem === "homepage"}
@@ -183,11 +283,10 @@ class Analyse extends Component {
                                 active={activeItem === "analyse"}
                                 as={Link} to="/analyse"
                             />
-                            <Menu.Item
-                                name="login"
-                                active={activeItem === "login"}
-                                as={Link} to="/login"
-                            />
+
+                            {/* Conditional sign in -- either login or logout appears as an option */}
+                            {signInStatus}
+
                             <Menu.Item
                                 name="help"
                                 active={activeItem === "help"}
@@ -239,6 +338,7 @@ class Analyse extends Component {
                                         </Container>
                                     </Grid.Column>
                                 </Grid.Row>
+                                {saveButton}
                             </Grid>
                         </Segment>
                     </GridColumn>

@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Grid, GridColumn, Header, Segment, Button, Menu, Icon, Form, Popup, Modal, Input, Container } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Segment, Button, Menu, Icon, Form, Popup, Modal, Input, List } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import { auth, provider, db } from "../../../firebase";
 import cookie from "react-cookies";
-// import history from "../../history";
+
 
 // TODO: Fix logincheck being fired on load
 
@@ -32,12 +32,12 @@ class Login extends Component {
         this.addUserToDB = this.addUserToDB.bind(this);
         this.signUp = this.signUp.bind(this);
         this.signInEmail = this.signInEmail.bind(this);
+        this.signOut = this.signOut.bind(this);
 
-        console.log(this.state.user)
+        console.log(cookie.load('user'))
     }
 
-    handleChange(e, type) {
-        console.log(type)
+    handleChange(e, type = "") {
         this.setState({
             [type]: e.value,
         });
@@ -46,6 +46,8 @@ class Login extends Component {
     componentDidMount() {
         let getUID = cookie.load('user')
         this.state =  { user: getUID }
+
+        console.log("login mount user:", this.state.user )
     }
 
     componentWillUnmount() {
@@ -74,8 +76,6 @@ class Login extends Component {
     // checks if login is successful
     logInCheck = () => {
         const user = this.state.user;
-        console.log("check user: ", user)
-
         auth.onAuthStateChanged((user) => {
             if(user) {
                 console.log("Sign in successful")
@@ -106,7 +106,6 @@ class Login extends Component {
     signUp = () => {
         const email = this.state.email
         const password = this.state.password
-        console.log("email: ", email)
 
         auth.createUserWithEmailAndPassword(email, password)
             .then((result) => {
@@ -121,12 +120,11 @@ class Login extends Component {
         const email = this.state.email
         const password = this.state.password
 
-        console.log("email: ", email)
-
         auth.signInWithEmailAndPassword(email, password)
             .then((result) => {
                 const user = result.user
                 this.setState({user: user})
+                this.logInCheck();
             })
     }
 
@@ -143,17 +141,37 @@ class Login extends Component {
     render() {
 
         const { activeItem, loggedIn, email, password } = this.state;
-        let prevArticle, signInStatus;
+        let prevArticles, signInStatus;
 
-        if(loggedIn) {
+        let cookieUser = cookie.load('user')
+
+        if(cookieUser) {
             signInStatus = <Menu.Item
                 name="Logout"
                 active={activeItem === "homepage"}
                 as={Link} to="/login"
-                onClick={this.signOut.bind(this)}
+                onClick={this.signOut}
             />
 
-            prevArticle = <Container><Header>Previous articles</Header></Container>
+            prevArticles = 
+            <div>
+                <Header textAlign="center">Previous articles</Header>
+            <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
+                <List bulleted>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                </List>
+            </Menu>
+            </div>
+            
 
         } else {
             signInStatus = <Menu.Item
@@ -174,12 +192,12 @@ class Login extends Component {
                     </Grid.Column>
                 </Grid.Row>
 
-                {/* Nav */}
+                {/* Menu */}
                 <Grid.Row>
                     <GridColumn width={2}>
-
+                        {prevArticles}
                         <Grid.Row>
-                            <Menu fluid vertical>
+                            <Menu secondary fluid vertical>
                                 <Menu.Item
                                     name="homepage"
                                     active={activeItem === "homepage"}
@@ -200,10 +218,6 @@ class Login extends Component {
                                 />
                             </Menu>
                         </Grid.Row>
-                        
-                        <Grid.Row>
-                            {prevArticle}
-                        </Grid.Row>
 
                     </GridColumn>
 
@@ -222,11 +236,11 @@ class Login extends Component {
                                             <p></p>
                                             <Form.Field padded="true">
                                                 <label>Email:</label>
-                                                <input name="lEmail" onChange={this.handleChange}/>
+                                                <Input name="email" placeholder="Email" onChange={(e, value) => this.handleChange(value, "email")}/>
                                             </Form.Field>
 
                                             {/* Google sign in */}
-                                            <Button onClick={() => this.logInGoogle()}>Sign in with Google</Button>
+                                            <Button onClick={this.logInGoogle}>Sign in with Google</Button>
                                             
                                             {/* Email sign up */}
                                             <Modal trigger={<Button>Sign up with your email</Button>} name="emailSignUp">
@@ -235,11 +249,11 @@ class Login extends Component {
                                                     <Form>
                                                         <Form.Field>
                                                             <label>Email:</label>
-                                                            <Input name={email} placeholder="Email" onChange={(e, value) => this.handleChange(e.target.value, "email")}/>
+                                                            <Input name={email} placeholder="Email" onChange={(e, value) => this.handleChange(value, "email")}/>
                                                         </Form.Field>
                                                         <Form.Field>
                                                             <label>Password:</label>
-                                                            <Input name={password} type="password" onChange={(e, value) => this.handleChange(value, "password")}/>
+                                                            <Input name={password} type="password" placeholder="Password" onChange={(e, value) => this.handleChange(value, "password")}/>
                                                         </Form.Field>
 
                                                         <Button 
@@ -257,7 +271,7 @@ class Login extends Component {
 
                                             <Form.Field>
                                                 <label>Password:</label>
-                                                <input name="password" type="password" onChange={this.handleChange}/>
+                                                <Input name="password" type="password" placeholder="Password" onChange={(e, value) => this.handleChange(value, "password")}/>
                                             </Form.Field>
 
                                             <Button type="submit" onClick={this.signInEmail}>

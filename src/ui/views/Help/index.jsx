@@ -1,18 +1,87 @@
 import React, {Component} from "react";
-import { Grid, GridColumn, Header, Menu } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Menu, List } from "semantic-ui-react";
 import { Link } from "react-router-dom"
+import cookie from "react-cookies";
+import { auth } from "../../../firebase";
 
 class Help extends Component {
     constructor(props) {
         super(props)
         this.state = {
             activeItem: "help",
+            loggedIn: false,
+            user: {},
         }
+    }
+
+    componentDidMount() {
+        let getUID = cookie.load('user')
+        this.state =  { user: getUID }
+
+        if((this.state.user)!== null) {
+            this.setState({loggedIn: true})
+        }
+
+        this.signOut = this.signOut.bind(this);
+
+        console.log("help mount user:", this.state.user)
+    }
+
+    componentWillUnmount() {
+        this.loggedIn = this.state.loggedIn;
+    }
+
+    signOut = () => {
+        auth.signOut()
+            .then(() => {
+                console.log("Sign out successful")
+                this.setState({loggedIn: false})
+                cookie.remove('user', { path: '/' })
+                
+                console.log("signout user: ", this.state.user)
+            }).catch(() => {
+                console.log("Sign out unsuccessful")
+            })
     }
 
     render() {
 
         const { activeItem } = this.state;
+        let prevArticles, signInStatus;
+
+        let cookieUser = cookie.load('user')
+
+        if(cookieUser) {
+            signInStatus = <Menu.Item
+                name="Logout"
+                active={activeItem === "homepage"}
+                as={Link} to="/login"
+                onClick={this.signOut}
+            />
+
+            prevArticles = 
+            <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
+                <List bulleted>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                    <List.Item>hi</List.Item>
+                </List>
+            </Menu>
+
+        } else {
+            signInStatus = <Menu.Item
+                name="login"
+                active={activeItem === "login"}
+                as={Link} to="/login"
+            />
+        }
 
         return (
             <Grid celled divided>
@@ -27,7 +96,8 @@ class Help extends Component {
 
                 <Grid.Row>
                     <GridColumn width={2}>
-                        <Menu fluid vertical>
+                        {prevArticles}
+                        <Menu secondary fluid vertical>
                             <Menu.Item
                                 name="homepage"
                                 active={activeItem === "homepage"}
@@ -38,11 +108,10 @@ class Help extends Component {
                                 active={activeItem === "analyse"}
                                 as={Link} to="/analyse"
                             />
-                            <Menu.Item
-                                name="login"
-                                active={activeItem === "login"}
-                                as={Link} to="/login"
-                            />
+
+                            {/* Conditional sign in -- either login or logout appears as an option */}
+                            {signInStatus}
+
                             <Menu.Item
                                 name="help"
                                 active={activeItem === "help"}
