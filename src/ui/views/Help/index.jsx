@@ -16,7 +16,7 @@ class Help extends Component {
 
     componentDidMount() {
         let getUID = cookie.load('user')
-        this.state =  { user: getUID }
+        this.setState({user: getUID})
 
         if((this.state.user)!== null) {
             this.setState({loggedIn: true})
@@ -60,6 +60,8 @@ class Help extends Component {
             />
 
             prevArticles = 
+            <div>
+                <Header textAlign="center">Previous articles</Header>
             <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
                 <List bulleted>
                     <List.Item>hi</List.Item>
@@ -74,6 +76,7 @@ class Help extends Component {
                     <List.Item>hi</List.Item>
                 </List>
             </Menu>
+            </div>
 
         } else {
             signInStatus = <Menu.Item

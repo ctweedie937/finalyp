@@ -29,6 +29,7 @@ class Analyse extends Component {
         this.handleChange = this.handleChange.bind(this)
         this.httpReq = this.httpReq.bind(this)
         this.signOut = this.signOut.bind(this);
+        this.saveArticle = this.saveArticle.bind(this);
     }
 
     // input change
@@ -40,7 +41,7 @@ class Analyse extends Component {
 
     componentDidMount() {
         let getUID = cookie.load('user')
-        this.state =  { user: getUID }
+        this.setState({user: getUID})
 
         if((this.state.user)!== null) {
             this.setState({loggedIn: true})
@@ -192,20 +193,21 @@ class Analyse extends Component {
             })
     }
 
-    // saveArticle = () => {
-    //     const artid = user.uid;
-    //     db.collection("analysedArticles").doc(uid).set({
-    //         headline: title,
-    //         content: content,
-    //         url: url,
-    //         fake: verdict,
-    //     }).then(() => {
-    //         console.log("added to analysed articles")
-    //         db.collection("prevAccessed").doc()
-    //     }).catch((err) => {
-    //         console.error(err)
-    //     });
-    // }
+    saveArticle = () => {
+        console.log("in saveArticle")
+        // db.collection("analysedArticles").add({
+        //     headline: this.state.title,
+        //     content: this.state.content,
+        //     url: this.state.url,
+        //     fake: this.state.verdict,
+        // }).then(() => {
+        //     console.log("added to analysed articles")
+        // }).catch((err) => {
+        //     console.error(err)
+        // }).then(() => {
+
+        // });
+    }
 
     render() {
 
@@ -243,7 +245,7 @@ class Analyse extends Component {
             if(title || content) {
                 saveButton = 
                 <Grid.Column>
-                    <Button>
+                    <Button onClick={this.saveArticle}>
                         Save
                     </Button>
                 </Grid.Column>
