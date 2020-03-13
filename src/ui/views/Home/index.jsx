@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Grid, GridColumn, Header, Menu, Container, List } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Menu, List } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import cookie from "react-cookies";
 import { auth } from "../../../firebase";
@@ -19,7 +19,7 @@ class Home extends Component {
 
     componentDidMount() {
         let getUID = cookie.load('user')
-        this.state =  { user: getUID }
+        this.setState({user: getUID})
 
         if((this.state.user)!== null) {
             this.setState({loggedIn: true})

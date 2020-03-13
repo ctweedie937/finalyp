@@ -45,7 +45,7 @@ class Login extends Component {
 
     componentDidMount() {
         let getUID = cookie.load('user')
-        this.state =  { user: getUID }
+        this.setState({user: getUID})
 
         console.log("login mount user:", this.state.user )
     }
@@ -140,7 +140,7 @@ class Login extends Component {
 
     render() {
 
-        const { activeItem, loggedIn, email, password } = this.state;
+        const { activeItem, email, password } = this.state;
         let prevArticles, signInStatus;
 
         let cookieUser = cookie.load('user')
