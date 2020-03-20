@@ -126,6 +126,7 @@ class Analyse extends Component {
         http.onreadystatechange = (e) => {
             if (http.readyState === 4) {
                 console.log(http.response)
+                console.time()
                 res = JSON.parse(http.response)
 
                 // checks if title/content/domain is empty and handles logic accordingly
@@ -172,6 +173,7 @@ class Analyse extends Component {
 
                 this.displayColour()
                 this.displayVerdict()
+                console.timeEnd()
             }
         }
 
@@ -195,18 +197,16 @@ class Analyse extends Component {
 
     saveArticle = () => {
         console.log("in saveArticle")
-        // db.collection("analysedArticles").add({
-        //     headline: this.state.title,
-        //     content: this.state.content,
-        //     url: this.state.url,
-        //     fake: this.state.verdict,
-        // }).then(() => {
-        //     console.log("added to analysed articles")
-        // }).catch((err) => {
-        //     console.error(err)
-        // }).then(() => {
-
-        // });
+        db.collection("analysedArticles").add({
+            headline: this.state.title,
+            content: this.state.content,
+            url: this.state.url,
+            fake: this.state.verdict,
+        }).then(() => {
+            console.log("added to analysed articles")
+        }).catch((err) => {
+            console.error(err)
+        })
     }
 
     render() {
