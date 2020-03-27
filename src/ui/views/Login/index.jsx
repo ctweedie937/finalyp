@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Grid, GridColumn, Header, Segment, Button, Menu, Icon, Form, Popup, Modal, Input, List } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Segment, Button, Menu, Icon, Form, Popup, Modal, Input, Divider } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import { auth, provider, db } from "../../../firebase";
+import { ArticlesList } from "../../components/ArticlesList"
 import cookie from "react-cookies";
 
 
@@ -37,6 +38,7 @@ class Login extends Component {
         console.log(cookie.load('user'))
     }
 
+    // input change
     handleChange(e, type = "") {
         this.setState({
             [type]: e.value,
@@ -45,14 +47,67 @@ class Login extends Component {
 
     componentDidMount() {
         let getUID = cookie.load('user')
-        this.setState({user: getUID})
+        this.setState({ user: getUID })
 
-        console.log("login mount user:", this.state.user )
+        if (getUID !== undefined) {
+            this.setState({ loggedIn: true })
+            if (getUID.email !== undefined) {
+                this.unsubscribeArticles = db.collection("analysedArticles").where("owner", "==", getUID.email).onSnapshot(this.articles_update)
+                // this.unsubscribeOtherArticles = db.collection("analysedArticles").where("users", "array-contains", getUID.email).onSnapshot(this.other_articles_update)
+            }
+        }
+
+        console.log("login mount user:", this.state.user)
     }
 
     componentWillUnmount() {
         this.loggedIn = this.state.loggedIn;
+        if (this.unsubscribeArticles) {
+            this.unsubscribeArticles();
+        }
+        // if (this.unsubscribeArticles) {
+        //     this.unsubscribeArticles()
+        // }
     }
+
+    articles_update = (snapshot) => {
+        console.log("articles update")
+        const articles = snapshot.docs.map(docSnapshot => {
+            const docData = docSnapshot.data();
+            console.log(docData)
+            return ({
+                content: docSnapshot.content,
+                headline: docData.headline,
+                url: docData.url,
+                fake: docData.fake,
+                users: docData.users,
+                key: docSnapshot.id,
+            })
+        });
+        this.setState({
+            articles: articles
+        })
+    };
+
+//    other_articles_update = (snapshot) => {
+//         console.log("other articles update")
+//         const articles = snapshot.docs.map(docSnapshot => {
+//             const docData = docSnapshot.data();
+//             console.log(docData)
+//             return ({
+//                 content: docSnapshot.content,
+//                 headline: docData.headline,
+//                 url: docData.url,
+//                 fake: docData.fake,
+//                 users: docData.users,
+//                 key: docSnapshot.id,
+//             })
+//         });
+//         this.setState({
+//             other_articles: articles
+//         })
+//     };
+
 
     // adds user to db
     addUserToDB = (user) => {
@@ -156,20 +211,15 @@ class Login extends Component {
             prevArticles = 
             <div>
                 <Header textAlign="center">Previous articles</Header>
-            <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
-                <List bulleted>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                </List>
-            </Menu>
+                <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
+                <ArticlesList articles={this.state.articles}/>
+                </Menu>
+                <Divider />
+                {/* <Header textAlign="center">Shared articles</Header>
+                <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
+                <ArticlesList articles={this.state.other_articles}/>
+                </Menu>
+                <Divider /> */}
             </div>
             
 
