@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
-import { Grid, GridColumn, Header, Segment, Input, Button, Menu, Progress, Container, Label, List } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Segment, Input, Button, Menu, Progress, Container, Label, Divider, Form, Modal } from "semantic-ui-react";
 import { Link } from "react-router-dom"
 import cookie from "react-cookies";
 import { auth } from "../../../firebase";
 import { db } from "../../../firebase.js";
+import { ArticlesList } from "../../components/ArticlesList"
 
 
 
@@ -25,11 +26,13 @@ class Analyse extends Component {
             displayUrl: "",
             loggedIn: false,
             user: {},
+            // shareEmail: "",
         }
         this.handleChange = this.handleChange.bind(this)
         this.httpReq = this.httpReq.bind(this)
         this.signOut = this.signOut.bind(this);
         this.saveArticle = this.saveArticle.bind(this);
+        // this.shareArticle = this.shareArticle.bind(this);
     }
 
     // input change
@@ -41,18 +44,64 @@ class Analyse extends Component {
 
     componentDidMount() {
         let getUID = cookie.load('user')
-        this.setState({user: getUID})
+        this.setState({ user: getUID })
 
-        if((this.state.user)!== null) {
-            this.setState({loggedIn: true})
+        if (getUID !== undefined) {
+            this.setState({ loggedIn: true })
+            if (getUID.email !== undefined) {
+                this.unsubscribeArticles = db.collection("analysedArticles").where("owner", "==", getUID.email).onSnapshot(this.articles_update)
+                // this.unsubscribeOtherArticles = db.collection("analysedArticles").where("users", "array-contains", getUID.email).onSnapshot(this.other_articles_update)
+            }
         }
 
-        console.log("analyse  mount user:", this.state.user )
+        console.log("login mount user:", this.state.user)
     }
 
     componentWillUnmount() {
         this.loggedIn = this.state.loggedIn;
+        if (this.unsubscribeArticles) {
+            this.unsubscribeArticles();
+        }
     }
+
+    articles_update = (snapshot) => {
+        console.log("articles update")
+        const articles = snapshot.docs.map(docSnapshot => {
+            const docData = docSnapshot.data();
+            console.log(docData)
+            return ({
+                content: docSnapshot.content,
+                headline: docData.headline,
+                url: docData.url,
+                fake: docData.fake,
+                users: docData.users,
+                key: docSnapshot.id,
+            })
+        });
+        this.setState({
+            articles: articles
+        })
+    };
+
+    // other_articles_update = (snapshot) => {
+    //     console.log("other articles update")
+    //     const articles = snapshot.docs.map(docSnapshot => {
+    //         const docData = docSnapshot.data();
+    //         console.log(docData)
+    //         return ({
+    //             content: docSnapshot.content,
+    //             headline: docData.headline,
+    //             url: docData.url,
+    //             fake: docData.fake,
+    //             users: docData.users,
+    //             key: docSnapshot.id,
+    //         })
+    //     });
+    //     this.setState({
+    //         other_articles: articles
+    //     })
+    // };
+
 
     // displays certain colour bar depending on rating
     displayColour() {
@@ -93,7 +142,7 @@ class Analyse extends Component {
     }
 
     // post request to fakebox
-    httpReq = () => {        
+    httpReq = () => {
         const http = new XMLHttpRequest();
         const postUrl = "http://localhost:8080/fakebox/check/"
         const { title, url, content } = this.state;
@@ -103,13 +152,13 @@ class Analyse extends Component {
         let res;
 
         // sets states to default 
-        this.setState({ 
-            score: 0, 
-            color: "", 
+        this.setState({
+            score: 0,
+            color: "",
             trusted: "unassigned domain",
             displayTitle: "",
             displayContent: "",
-            displayUrl: "",  
+            displayUrl: "",
         })
 
 
@@ -164,7 +213,7 @@ class Analyse extends Component {
                 const displayUrl = res["domain"]["domain"]
 
                 console.log("totalScore: ", totalScore)
-                this.setState({ 
+                this.setState({
                     score: totalScore,
                     displayTitle: title,
                     displayContent: content,
@@ -186,9 +235,9 @@ class Analyse extends Component {
         auth.signOut()
             .then(() => {
                 console.log("Sign out successful")
-                this.setState({loggedIn: false})
+                this.setState({ loggedIn: false })
                 cookie.remove('user', { path: '/' })
-                
+
                 console.log("signout user: ", this.state.user)
             }).catch(() => {
                 console.log("Sign out unsuccessful")
@@ -201,7 +250,8 @@ class Analyse extends Component {
             headline: this.state.title,
             content: this.state.content,
             url: this.state.url,
-            fake: this.state.verdict,
+            fake: this.state.score,
+            owner: this.state.user.email,
         }).then(() => {
             console.log("added to analysed articles")
         }).catch((err) => {
@@ -209,14 +259,25 @@ class Analyse extends Component {
         })
     }
 
+    // shareArticle = () => {
+    //     console.log("in shareArticle")
+    //     console.log(this.state.user.email)
+    //     db.collection("analysedArticles").where("").add({
+            
+    //     })
+    //     .catch((err) => {
+    //         console.error(err)
+    //     })
+    // }
+
     render() {
 
         const { title, content, url, activeItem, score, trusted, colour, verdict, displayTitle, displayContent, displayUrl } = this.state;
-        let prevArticles, signInStatus, saveButton;
+        let prevArticles, signInStatus, saveButton, shareArticle;
 
         let cookieUser = cookie.load('user')
 
-        if(cookieUser) {
+        if (cookieUser) {
             signInStatus = <Menu.Item
                 name="Logout"
                 active={activeItem === "homepage"}
@@ -224,32 +285,48 @@ class Analyse extends Component {
                 onClick={this.signOut}
             />
 
-            prevArticles = 
+            prevArticles =
                 <div>
                     <Header textAlign="center">Previous articles</Header>
-                    <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
-                    <List bulleted>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                        <List.Item>hi</List.Item>
-                    </List>
-                </Menu>
+                    <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
+                        <ArticlesList articles={this.state.articles} />
+                    </Menu>
+                    <Divider />
+                    {/* <Header textAlign="center">Shared articles</Header>
+                    <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
+                        <ArticlesList articles={this.state.other_articles} />
+                    </Menu>
+                    <Divider /> */}
                 </div>
-            if(title || content) {
-                saveButton = 
-                <Grid.Column>
-                    <Button onClick={this.saveArticle}>
-                        Save
+            if (title || content) {
+                saveButton =
+                    <Grid.Column>
+                        <Button onClick={this.saveArticle}>
+                            Save
                     </Button>
-                </Grid.Column>
+                    </Grid.Column>
 
+                // shareArticle =
+                //     <Grid.Column>
+                //         <Modal trigger={<Button>Share</Button>} name="share">
+                //             <Modal.Header>Share Article</Modal.Header>
+                //             <Modal.Content>
+                //                 <Form>
+                //                     <Form.Field>
+                //                         <label>Person to share article with's email:</label>
+                //                         <Input name="" placeholder="Email" onChange={(e, value) => this.handleChange(value, "shareEmail")} />
+                //                     </Form.Field>
+                //                     <Button
+                //                         type="submit"
+                //                         // onClick={Link} to="/home"
+                //                         onClick={this.shareArticle}
+                //                     >
+                //                         Share
+                //                     </Button>
+                //                 </Form>
+                //             </Modal.Content>
+                //         </Modal>
+                //     </Grid.Column>
             }
 
         } else {

@@ -1,8 +1,9 @@
 import React, {Component} from "react";
-import { Grid, GridColumn, Header, Menu, List } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Menu, Divider } from "semantic-ui-react";
 import { Link } from "react-router-dom"
 import cookie from "react-cookies";
 import { auth } from "../../../firebase";
+import { ArticlesList } from "../../components/ArticlesList"
 
 class Help extends Component {
     constructor(props) {
@@ -30,6 +31,45 @@ class Help extends Component {
     componentWillUnmount() {
         this.loggedIn = this.state.loggedIn;
     }
+
+    articles_update = (snapshot) => {
+        console.log("articles update")
+        const articles = snapshot.docs.map(docSnapshot => {
+            const docData = docSnapshot.data();
+            console.log(docData)
+            return ({
+                content: docSnapshot.content,
+                headline: docData.headline,
+                url: docData.url,
+                fake: docData.fake,
+                users: docData.users,
+                key: docSnapshot.id,
+            })
+        });
+        this.setState({
+            articles: articles
+        })
+    };
+
+//    other_articles_update = (snapshot) => {
+//         console.log("other articles update")
+//         const articles = snapshot.docs.map(docSnapshot => {
+//             const docData = docSnapshot.data();
+//             console.log(docData)
+//             return ({
+//                 content: docSnapshot.content,
+//                 headline: docData.headline,
+//                 url: docData.url,
+//                 fake: docData.fake,
+//                 users: docData.users,
+//                 key: docSnapshot.id,
+//             })
+//         });
+//         this.setState({
+//             other_articles: articles
+//         })
+//     };
+
 
     signOut = () => {
         auth.signOut()
@@ -62,20 +102,15 @@ class Help extends Component {
             prevArticles = 
             <div>
                 <Header textAlign="center">Previous articles</Header>
-            <Menu secondary fluid vertical style={{overflow: 'auto', maxHeight: 100 }}>
-                <List bulleted>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                    <List.Item>hi</List.Item>
-                </List>
-            </Menu>
+                <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
+                <ArticlesList articles={this.state.articles}/>
+                </Menu>
+                <Divider />
+                {/* <Header textAlign="center">Shared articles</Header>
+                <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
+                <ArticlesList articles={this.state.other_articles}/>
+                </Menu>
+                <Divider /> */}
             </div>
 
         } else {

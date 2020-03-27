@@ -1,0 +1,17 @@
+version: '3'
+services:
+  machinebox:
+    image: machinebox/fakebox
+    ports:
+      - "8080:8080"
+    environment: 
+        MB_KEY: "${MB_KEY}"
+  ui:
+    privileged: true
+    depends_on:
+      - machinebox
+    build:
+      context: src/ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
