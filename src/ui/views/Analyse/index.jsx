@@ -50,11 +50,8 @@ class Analyse extends Component {
             this.setState({ loggedIn: true })
             if (getUID.email !== undefined) {
                 this.unsubscribeArticles = db.collection("analysedArticles").where("owner", "==", getUID.email).onSnapshot(this.articles_update)
-                // this.unsubscribeOtherArticles = db.collection("analysedArticles").where("users", "array-contains", getUID.email).onSnapshot(this.other_articles_update)
             }
         }
-
-        console.log("login mount user:", this.state.user)
     }
 
     componentWillUnmount() {
@@ -82,26 +79,6 @@ class Analyse extends Component {
             articles: articles
         })
     };
-
-    // other_articles_update = (snapshot) => {
-    //     console.log("other articles update")
-    //     const articles = snapshot.docs.map(docSnapshot => {
-    //         const docData = docSnapshot.data();
-    //         console.log(docData)
-    //         return ({
-    //             content: docSnapshot.content,
-    //             headline: docData.headline,
-    //             url: docData.url,
-    //             fake: docData.fake,
-    //             users: docData.users,
-    //             key: docSnapshot.id,
-    //         })
-    //     });
-    //     this.setState({
-    //         other_articles: articles
-    //     })
-    // };
-
 
     // displays certain colour bar depending on rating
     displayColour() {
@@ -259,17 +236,6 @@ class Analyse extends Component {
         })
     }
 
-    // shareArticle = () => {
-    //     console.log("in shareArticle")
-    //     console.log(this.state.user.email)
-    //     db.collection("analysedArticles").where("").add({
-            
-    //     })
-    //     .catch((err) => {
-    //         console.error(err)
-    //     })
-    // }
-
     render() {
 
         const { title, content, url, activeItem, score, trusted, colour, verdict, displayTitle, displayContent, displayUrl } = this.state;
@@ -292,11 +258,6 @@ class Analyse extends Component {
                         <ArticlesList articles={this.state.articles} />
                     </Menu>
                     <Divider />
-                    {/* <Header textAlign="center">Shared articles</Header>
-                    <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
-                        <ArticlesList articles={this.state.other_articles} />
-                    </Menu>
-                    <Divider /> */}
                 </div>
             if (title || content) {
                 saveButton =
