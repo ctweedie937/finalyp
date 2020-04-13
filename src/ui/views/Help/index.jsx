@@ -3,6 +3,7 @@ import { Grid, GridColumn, Header, Menu, Divider } from "semantic-ui-react";
 import { Link } from "react-router-dom"
 import cookie from "react-cookies";
 import { auth } from "../../../firebase";
+import { db } from "../../../firebase.js";
 import { ArticlesList } from "../../components/ArticlesList"
 
 class Help extends Component {
@@ -19,13 +20,14 @@ class Help extends Component {
         let getUID = cookie.load('user')
         this.setState({user: getUID})
 
-        if((this.state.user)!== null) {
-            this.setState({loggedIn: true})
+        if (getUID !== undefined) {
+            this.setState({ loggedIn: true })
+            if (getUID.email !== undefined) {
+                this.unsubscribeArticles = db.collection("analysedArticles").where("owner", "==", getUID.email).onSnapshot(this.articles_update)
+            }
         }
 
         this.signOut = this.signOut.bind(this);
-
-        console.log("help mount user:", this.state.user)
     }
 
     componentWillUnmount() {
@@ -51,34 +53,12 @@ class Help extends Component {
         })
     };
 
-//    other_articles_update = (snapshot) => {
-//         console.log("other articles update")
-//         const articles = snapshot.docs.map(docSnapshot => {
-//             const docData = docSnapshot.data();
-//             console.log(docData)
-//             return ({
-//                 content: docSnapshot.content,
-//                 headline: docData.headline,
-//                 url: docData.url,
-//                 fake: docData.fake,
-//                 users: docData.users,
-//                 key: docSnapshot.id,
-//             })
-//         });
-//         this.setState({
-//             other_articles: articles
-//         })
-//     };
-
-
     signOut = () => {
         auth.signOut()
             .then(() => {
                 console.log("Sign out successful")
                 this.setState({loggedIn: false})
                 cookie.remove('user', { path: '/' })
-                
-                console.log("signout user: ", this.state.user)
             }).catch(() => {
                 console.log("Sign out unsuccessful")
             })
@@ -106,11 +86,6 @@ class Help extends Component {
                 <ArticlesList articles={this.state.articles}/>
                 </Menu>
                 <Divider />
-                {/* <Header textAlign="center">Shared articles</Header>
-                <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
-                <ArticlesList articles={this.state.other_articles}/>
-                </Menu>
-                <Divider /> */}
             </div>
 
         } else {

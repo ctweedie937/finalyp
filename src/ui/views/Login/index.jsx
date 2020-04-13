@@ -53,11 +53,8 @@ class Login extends Component {
             this.setState({ loggedIn: true })
             if (getUID.email !== undefined) {
                 this.unsubscribeArticles = db.collection("analysedArticles").where("owner", "==", getUID.email).onSnapshot(this.articles_update)
-                // this.unsubscribeOtherArticles = db.collection("analysedArticles").where("users", "array-contains", getUID.email).onSnapshot(this.other_articles_update)
             }
         }
-
-        console.log("login mount user:", this.state.user)
     }
 
     componentWillUnmount() {
@@ -65,9 +62,6 @@ class Login extends Component {
         if (this.unsubscribeArticles) {
             this.unsubscribeArticles();
         }
-        // if (this.unsubscribeArticles) {
-        //     this.unsubscribeArticles()
-        // }
     }
 
     articles_update = (snapshot) => {
@@ -88,25 +82,6 @@ class Login extends Component {
             articles: articles
         })
     };
-
-//    other_articles_update = (snapshot) => {
-//         console.log("other articles update")
-//         const articles = snapshot.docs.map(docSnapshot => {
-//             const docData = docSnapshot.data();
-//             console.log(docData)
-//             return ({
-//                 content: docSnapshot.content,
-//                 headline: docData.headline,
-//                 url: docData.url,
-//                 fake: docData.fake,
-//                 users: docData.users,
-//                 key: docSnapshot.id,
-//             })
-//         });
-//         this.setState({
-//             other_articles: articles
-//         })
-//     };
 
 
     // adds user to db
@@ -215,11 +190,6 @@ class Login extends Component {
                 <ArticlesList articles={this.state.articles}/>
                 </Menu>
                 <Divider />
-                {/* <Header textAlign="center">Shared articles</Header>
-                <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
-                <ArticlesList articles={this.state.other_articles}/>
-                </Menu>
-                <Divider /> */}
             </div>
             
 

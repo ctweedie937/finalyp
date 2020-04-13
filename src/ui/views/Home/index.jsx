@@ -17,24 +17,18 @@ class Home extends Component {
             other_articles: [],
         }
         this.signOut = this.signOut.bind(this);
-        console.log("Home user: ", this.state.user)
     }
 
     componentDidMount() {
         let getUID = cookie.load('user')
         this.setState({ user: getUID })
 
-        // console.log(getUID.email)
-
         if (getUID !== undefined) {
             this.setState({ loggedIn: true })
             if (getUID.email !== undefined) {
                 this.unsubscribeArticles = db.collection("analysedArticles").where("owner", "==", getUID.email).onSnapshot(this.articles_update)
-                // this.unsubscribeOtherArticles = db.collection("analysedArticles").where("users", "array-contains", getUID.email).onSnapshot(this.other_articles_update)
             }
         }
-
-        console.log("login mount user:", this.state.user)
     }
 
     componentWillUnmount() {
@@ -42,9 +36,6 @@ class Home extends Component {
         if (this.unsubscribeArticles) {
             this.unsubscribeArticles();
         }
-        // if (this.unsubscribeArticles) {
-        //     this.unsubscribeArticles()
-        // }
     }
 
     articles_update = (snapshot) => {
@@ -66,25 +57,6 @@ class Home extends Component {
         })
     };
 
-//    other_articles_update = (snapshot) => {
-//         console.log("other articles update")
-//         const articles = snapshot.docs.map(docSnapshot => {
-//             const docData = docSnapshot.data();
-//             console.log(docData)
-//             return ({
-//                 content: docSnapshot.content,
-//                 headline: docData.headline,
-//                 url: docData.url,
-//                 fake: docData.fake,
-//                 users: docData.users,
-//                 key: docSnapshot.id,
-//             })
-//         });
-//         this.setState({
-//             other_articles: articles
-//         })
-//     };
-
     signOut = () => {
         auth.signOut()
             .then(() => {
@@ -105,7 +77,6 @@ class Home extends Component {
         let signInStatus, prevArticles;
 
         let cookieUser = cookie.load('user')
-        console.log("home cookieUser: ", cookieUser)
 
         if (cookieUser) {
             signInStatus = <Menu.Item
@@ -121,12 +92,6 @@ class Home extends Component {
                     <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
                     <ArticlesList articles={this.state.articles}/>
                     </Menu>
-                    {/* <Divider />
-                    <Header textAlign="center">Shared articles</Header>
-                    <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
-                    <ArticlesList articles={this.state.other_articles}/>
-                    </Menu>
-                    <Divider /> */}
                 </div>
 
 
