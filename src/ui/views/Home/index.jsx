@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Grid, GridColumn, Header, Menu, Divider } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Menu } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import cookie from "react-cookies";
 import { db, auth } from "../../../firebase";
@@ -38,6 +38,7 @@ class Home extends Component {
         }
     }
 
+    // updates article list
     articles_update = (snapshot) => {
         console.log("articles update")
         const articles = snapshot.docs.map(docSnapshot => {
@@ -57,6 +58,7 @@ class Home extends Component {
         })
     };
 
+    // signs user out
     signOut = () => {
         auth.signOut()
             .then(() => {
@@ -72,7 +74,6 @@ class Home extends Component {
 
 
     render() {
-
         const { activeItem } = this.state;
         let signInStatus, prevArticles;
 
@@ -88,7 +89,7 @@ class Home extends Component {
 
             prevArticles =
                 <div>
-                    <Header textAlign="center">Previous articles</Header>
+                    <Header textAlign="center" name="prevArticles">Previous articles</Header>
                     <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
                     <ArticlesList articles={this.state.articles}/>
                     </Menu>
@@ -111,7 +112,7 @@ class Home extends Component {
                         <Header size="huge" textAlign="center"></Header>
                     </Grid.Column>
                     <Grid.Column width={13}>
-                        <Header size="huge" textAlign="center">Fake News Detector</Header>
+                        <Header name="mainTitle" size="huge" textAlign="center">Fake News Detector</Header>
                     </Grid.Column>
                 </Grid.Row>
 

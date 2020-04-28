@@ -1,9 +1,8 @@
 FROM node:8.9.4-alpine AS builder
-RUN mkdir -p /app
-
+COPY . /app/
 WORKDIR /app
-
-ARG machine_box_key
-RUN docker run -p 8080:8080 -e "MB_KEY=$machine_box_key" machinebox/fakebox
 ENV PATH /app/node_modules/.bin:$PATH
+RUN npm install
 ENV FAKEBOX_API=http://localhost:8080
+EXPOSE 3000
+CMD ["npm", "start"]

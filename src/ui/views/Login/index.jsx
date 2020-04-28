@@ -5,9 +5,6 @@ import { auth, provider, db } from "../../../firebase";
 import { ArticlesList } from "../../components/ArticlesList"
 import cookie from "react-cookies";
 
-
-// TODO: Fix logincheck being fired on load
-
 class Login extends Component {
     constructor(props) {
         super(props)
@@ -63,7 +60,8 @@ class Login extends Component {
             this.unsubscribeArticles();
         }
     }
-
+    
+    // updates article list
     articles_update = (snapshot) => {
         console.log("articles update")
         const articles = snapshot.docs.map(docSnapshot => {
@@ -185,7 +183,7 @@ class Login extends Component {
 
             prevArticles = 
             <div>
-                <Header textAlign="center">Previous articles</Header>
+                <Header textAlign="center" name="prevArticles">Previous articles</Header>
                 <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
                 <ArticlesList articles={this.state.articles}/>
                 </Menu>
@@ -208,7 +206,7 @@ class Login extends Component {
                         <Header size="huge" textAlign="center"></Header>
                     </Grid.Column>
                     <Grid.Column width={13}>
-                        <Header size="huge" textAlign="center">Fake News Detector</Header>
+                        <Header name="mainTitle" size="huge" textAlign="center">Fake News Detector</Header>
                     </Grid.Column>
                 </Grid.Row>
 
@@ -278,7 +276,6 @@ class Login extends Component {
 
                                                         <Button 
                                                         type="submit"
-                                                        // onClick={Link} to="/home"
                                                         onClick={this.signUp}
                                                         >
                                                             Login

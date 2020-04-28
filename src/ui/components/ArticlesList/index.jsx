@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
-import { List, Divider } from "semantic-ui-react";
+import { List } from "semantic-ui-react";
 
 export class ArticlesList extends Component {
     state = {
@@ -14,6 +14,7 @@ export class ArticlesList extends Component {
         }
     }
 
+    // displays articles
     render_articles() {
         if(this.state.articles !== undefined) {
           return this.state.articles.map((article) => {
