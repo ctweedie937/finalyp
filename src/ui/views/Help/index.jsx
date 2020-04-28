@@ -34,6 +34,7 @@ class Help extends Component {
         this.loggedIn = this.state.loggedIn;
     }
 
+    // updates articles list
     articles_update = (snapshot) => {
         console.log("articles update")
         const articles = snapshot.docs.map(docSnapshot => {
@@ -52,7 +53,8 @@ class Help extends Component {
             articles: articles
         })
     };
-
+    
+    // signs users out
     signOut = () => {
         auth.signOut()
             .then(() => {
@@ -65,7 +67,6 @@ class Help extends Component {
     }
 
     render() {
-
         const { activeItem } = this.state;
         let prevArticles, signInStatus;
 
@@ -81,7 +82,7 @@ class Help extends Component {
 
             prevArticles = 
             <div>
-                <Header textAlign="center">Previous articles</Header>
+                <Header textAlign="center" name="prevArticles">Previous articles</Header>
                 <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
                 <ArticlesList articles={this.state.articles}/>
                 </Menu>
@@ -103,7 +104,7 @@ class Help extends Component {
                         <Header size="huge" textAlign="center"></Header>
                     </Grid.Column>
                     <Grid.Column width={13}>
-                        <Header size="huge" textAlign="center">Fake News Detector</Header>
+                    <Header name="mainTitle" size="huge" textAlign="center">Fake News Detector</Header>
                     </Grid.Column>
                 </Grid.Row>
 

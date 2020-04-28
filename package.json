@@ -37,6 +37,8 @@
     ]
   },
   "devDependencies": {
-    "chromedriver": "^80.0.1"
+    "chromedriver": "^80.0.2",
+    "geckodriver": "^1.19.1",
+    "selenium-server": "^3.141.59"
   }
 }

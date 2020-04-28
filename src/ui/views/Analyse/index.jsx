@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import 'semantic-ui-css/semantic.min.css';
-import { Grid, GridColumn, Header, Segment, Input, Button, Menu, Progress, Container, Label, Divider, Form, Modal } from "semantic-ui-react";
+import { Grid, GridColumn, Header, Segment, Input, Button, Menu, Progress, Container, Label, Divider } from "semantic-ui-react";
 import { Link } from "react-router-dom"
 import cookie from "react-cookies";
 import { auth } from "../../../firebase";
@@ -26,13 +26,11 @@ class Analyse extends Component {
             displayUrl: "",
             loggedIn: false,
             user: {},
-            // shareEmail: "",
         }
         this.handleChange = this.handleChange.bind(this)
         this.httpReq = this.httpReq.bind(this)
         this.signOut = this.signOut.bind(this);
         this.saveArticle = this.saveArticle.bind(this);
-        // this.shareArticle = this.shareArticle.bind(this);
     }
 
     // input change
@@ -61,6 +59,7 @@ class Analyse extends Component {
         }
     }
 
+    // updates articles list
     articles_update = (snapshot) => {
         console.log("articles update")
         const articles = snapshot.docs.map(docSnapshot => {
@@ -106,7 +105,7 @@ class Analyse extends Component {
         if (verdict > 0 && verdict <= 0.2) {
             this.setState({ verdict: "Very unlikely to be fake" })
         } else if (verdict > 0.2 && verdict <= 0.4) {
-            this.setState({ verdict: "Unikely to be fake" })
+            this.setState({ verdict: "Unlikely to be fake" })
         } else if (verdict > 0.4 && verdict <= 0.6) {
             this.setState({ verdict: "Neutral" })
         } else if (verdict > 0.6 && verdict <= 0.8) {
@@ -208,6 +207,7 @@ class Analyse extends Component {
         http.send(JSON.stringify(body))
     }
 
+    // signs user out
     signOut = () => {
         auth.signOut()
             .then(() => {
@@ -221,6 +221,7 @@ class Analyse extends Component {
             })
     }
 
+    // saves article to firebase collection
     saveArticle = () => {
         console.log("in saveArticle")
         db.collection("analysedArticles").add({
@@ -237,9 +238,8 @@ class Analyse extends Component {
     }
 
     render() {
-
         const { title, content, url, activeItem, score, trusted, colour, verdict, displayTitle, displayContent, displayUrl } = this.state;
-        let prevArticles, signInStatus, saveButton, shareArticle;
+        let prevArticles, signInStatus, saveButton;
 
         let cookieUser = cookie.load('user')
 
@@ -253,7 +253,7 @@ class Analyse extends Component {
 
             prevArticles =
                 <div>
-                    <Header textAlign="center">Previous articles</Header>
+                    <Header textAlign="center" name="prevArticles">Previous articles</Header>
                     <Menu secondary fluid vertical style={{ overflow: 'auto', maxHeight: 100 }}>
                         <ArticlesList articles={this.state.articles} />
                     </Menu>
@@ -262,32 +262,10 @@ class Analyse extends Component {
             if (title || content) {
                 saveButton =
                     <Grid.Column>
-                        <Button onClick={this.saveArticle}>
+                        <Button onClick={this.saveArticle} name="saveButton">
                             Save
                     </Button>
                     </Grid.Column>
-
-                // shareArticle =
-                //     <Grid.Column>
-                //         <Modal trigger={<Button>Share</Button>} name="share">
-                //             <Modal.Header>Share Article</Modal.Header>
-                //             <Modal.Content>
-                //                 <Form>
-                //                     <Form.Field>
-                //                         <label>Person to share article with's email:</label>
-                //                         <Input name="" placeholder="Email" onChange={(e, value) => this.handleChange(value, "shareEmail")} />
-                //                     </Form.Field>
-                //                     <Button
-                //                         type="submit"
-                //                         // onClick={Link} to="/home"
-                //                         onClick={this.shareArticle}
-                //                     >
-                //                         Share
-                //                     </Button>
-                //                 </Form>
-                //             </Modal.Content>
-                //         </Modal>
-                //     </Grid.Column>
             }
 
         } else {
@@ -305,7 +283,7 @@ class Analyse extends Component {
                         <Header size="huge" textAlign="center"></Header>
                     </Grid.Column>
                     <Grid.Column width={13}>
-                        <Header size="huge" textAlign="center">Fake News Detector</Header>
+                        <Header name="mainTitle" size="huge" textAlign="center">Fake News Detector</Header>
                     </Grid.Column>
                 </Grid.Row>
 
@@ -348,7 +326,7 @@ class Analyse extends Component {
                                         <Input name={url} placeholder="URL" onChange={(e, value) => this.handleChange(value, "url")} />
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Button onClick={this.httpReq}>Analyse!</Button>
+                                        <Button onClick={this.httpReq} name="analyseButton">Analyse!</Button>
                                     </Grid.Column>
                                 </Grid.Row>
 

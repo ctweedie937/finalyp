@@ -11,7 +11,7 @@ services:
     depends_on:
       - machinebox
     build:
-      context: src/ui
+      context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
