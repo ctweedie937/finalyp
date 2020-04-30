@@ -1,4 +1,4 @@
-FROM node:8.9.4-alpine AS builder
+FROM node:10.20.1-alpine AS builder
 COPY . /app/
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
