@@ -9,8 +9,8 @@ This software detects fake news and gives it a "fakeness" rating.
 - Sign up for a Veritone Account
 - Navigate to the Dashboard -> Machine box -> Your key -> Reveal your key
 - Copy the key
-2. In Terminal (or equivalent), execute this command: export MB_KEY=[...]
-Enter the key received from Machinebox. Do not include the square brackets.
+2. In Terminal (or equivalent), execute this command: export MB_KEY=...
+Replace "..." with the key received from Machinebox.
 
 ## Installation
 1. Download the .zip file and save it onto the computer
