@@ -2,7 +2,7 @@
 Final year project - Claudia Tweedie
 --------------------------------------------------------------------------------
 
-This software detects fake news and gives it a "fakeness" rating.
+This software detects fake news and gives it a "fakeness" rating. I developed this project for my Final Year Project for university.
 
 ## Prerequisites
 1. Get Fakebox key from https://machinebox.io/
